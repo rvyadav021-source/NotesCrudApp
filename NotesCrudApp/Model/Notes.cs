@@ -3,7 +3,7 @@
     public class Notes
     {
         public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
+        public required string Title { get; set; }
         public string Content { get; set; } = string.Empty;
         public string priority { get; set; } = string.Empty;
     }
