@@ -11,9 +11,9 @@ namespace NotesCrudApp.Service
             this._NotesIRepo = repo;
         }
 
-        public async Task<IEnumerable<Notes>> GetAllNotes()
+        public async Task<IEnumerable<Notes>> GetAllAsync()
         {
-            return await this._NotesIRepo.GetAllNotes();
+            return await this._NotesIRepo.GetAllAsync();
         }
 
         public async Task<Notes?> GetByIdAsync(int id) => await _NotesIRepo.GetByIdAsync(id);

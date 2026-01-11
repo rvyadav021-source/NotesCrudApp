@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesCrudApp.IService;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using NotesCrudApp.Model;
 
 namespace NotesCrudApp.Controllers
 {
@@ -9,42 +8,58 @@ namespace NotesCrudApp.Controllers
     [ApiController]
     public class NotesController : ControllerBase
     {
-        private readonly NotesIService notesIService; 
+        private readonly NotesIService _service; 
         public NotesController(NotesIService service)
         {
-
+            _service = service;
         }
 
-        // GET: api/<NotesController>
+        // Get All notes api
+        //returns list of notes
         [HttpGet]
-        public IEnumerable<Notes> GetAllNotes()
+        public async Task<ActionResult<IEnumerable<Notes>>> GetAllAsync()
         {
-            return new string[] { "value1", "value2" };
+            return Ok(await _service.GetAllAsync());
         }
 
-        // GET api/<NotesController>/5
+        // Get note by Id API:  api/<NotesController>/5
+        //Return specific note by Id else emoty note object
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<Notes?>> Get(int id)
         {
-            return "value";
+            var note = await _service.GetByIdAsync(id);
+            if (note is null)
+            {
+                return NotFound();
+            }
+            return Ok(note);
         }
 
-        // POST api/<NotesController>
+        // Method to create a new note : return created note 
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<Notes>> Post([FromBody] Notes note_data)
         {
+            var createdNote = await _service.AddAsync(note_data);
+            return CreatedAtAction(nameof(Get), new { id = createdNote.Id }, createdNote);
         }
 
-        // PUT api/<NotesController>/5
+        // Update specific note 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] Notes note)
         {
+            if (id != note.Id) return BadRequest();
+            var updated = await _service.UpdateAsync(note);
+            if (!updated) return NotFound();
+            return NoContent();
         }
 
-        // DELETE api/<NotesController>/5
+        // Delete specific note by it's id api/notes/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
         }
     }
 }

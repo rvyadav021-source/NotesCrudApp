@@ -34,7 +34,7 @@ namespace NotesCrudApp.Repository
             return true;
         }
 
-        public async Task<IEnumerable<Notes>> GetAllNotes()
+        public async Task<IEnumerable<Notes>> GetAllAsync()
         {
             return await this._dbContext.Notes.ToListAsync();
         }
@@ -46,12 +46,16 @@ namespace NotesCrudApp.Repository
 
         public async Task<bool> UpdateAsync(Notes note)
         {
-            Notes notes = this._dbContext.Notes.Find(note.Id);
+            //Notes notes = this._dbContext.Notes.Find(note.Id);
+            //var existingNote = await _dbContext.Notes.FirstOrDefaultAsync(x => x.Id == note.Id);
+            //if (existingNote == null)
+            //    return false;
 
-            if(note == null)
-            {
-                return false;
-            }
+            //existingNote.Title = note.Title;
+            //existingNote.Content = note.Content;
+            //existingNote.Priority = note.Priority;
+
+           
 
             _dbContext.Notes.Update(note);
             await _dbContext.SaveChangesAsync();
