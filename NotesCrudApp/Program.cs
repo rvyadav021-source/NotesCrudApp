@@ -1,17 +1,30 @@
 using Microsoft.EntityFrameworkCore;
 using NotesCrudApp.Data;
+using NotesCrudApp.IRepository;
+using NotesCrudApp.IService;
+using NotesCrudApp.Repository;
+using NotesCrudApp.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Register AppDbContext with SQLite using connection string from configuration
+builder.Services.AddSwaggerGen(); // Swagger
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//Repo and service register
+builder.Services.AddScoped<NotesIRepository, NotesRepository>();
+builder.Services.AddScoped<NotesIService, NotesService>();
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll",
+    policy => policy
+    //.WithOrigins("http://localhost:4200")
+    .AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod());
+    });
 
 var app = builder.Build();
 
@@ -22,10 +35,13 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
